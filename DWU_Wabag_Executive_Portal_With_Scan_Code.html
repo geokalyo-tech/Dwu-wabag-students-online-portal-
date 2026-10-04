@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DWU Wabag Students Association Portal</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f3f7f5;color:#18352b}
+header{background:#0d5c45;color:white;padding:28px 20px;text-align:center}
+header h1{margin:0;font-size:28px}nav{background:#084534;display:flex;flex-wrap:wrap;justify-content:center}
+nav a{color:white;text-decoration:none;padding:14px 18px}.hero{padding:40px 20px;text-align:center;background:white}
+.container{max-width:1050px;margin:auto;padding:25px 18px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.card{background:white;border-radius:12px;padding:22px;box-shadow:0 2px 9px #0001;margin-bottom:18px}
+footer{text-align:center;background:#084534;color:white;padding:22px;margin-top:30px}
+#portal{display:none}.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:25px}
+.login{max-width:520px;width:100%;background:white;padding:32px;border-radius:18px;box-shadow:0 8px 30px #0001}
+label{display:block;margin:15px 0 7px}input{width:100%;padding:14px;border:1px solid #bbb;border-radius:8px;font-size:16px}
+button{width:100%;padding:14px;background:#0d5c45;color:white;border:0;border-radius:8px;font-weight:bold;font-size:16px;cursor:pointer;margin-top:18px}
+.error{color:#a33;background:#fdecec;padding:12px;border-radius:7px;margin-top:14px;display:none}
+.welcome{color:#17633f;background:#e9f7ef;padding:14px;border-radius:8px;margin:15px 0}.logout{max-width:180px;background:#777}
+.qr-card{text-align:center;max-width:520px;margin:25px auto}
+#qrCode{display:flex;justify-content:center;align-items:center;margin:18px auto}
+#qrCode img,#qrCode canvas{max-width:240px;height:auto}
+.qr-note{font-size:14px;color:#555;line-height:1.5}
+.scan-url{font-size:12px;word-break:break-all;background:#f3f7f5;padding:10px;border-radius:8px;margin-top:12px}
+
+.file-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;margin-top:8px;background:#f3f7f5;border-radius:8px}
+.file-row a{color:#0d5c45;font-weight:bold;overflow-wrap:anywhere}
+.delete-btn{width:auto;margin:0;padding:8px 12px;background:#a33}
+.files{margin-top:12px}
+section{scroll-margin-top:15px}
+
+.member-card{text-align:center}.front-member-card{margin-bottom:0}.front-member-card .delete-btn{display:none}
+.member-photo{width:120px;height:120px;border-radius:50%;object-fit:cover;border:4px solid #0d5c45;margin-bottom:10px}
+.member-card .delete-btn{width:auto;display:inline-block}
+</style>
+</head>
+<body>
+<div id="loginScreen" class="login-wrap">
+<div class="login">
+<h2>🔐 Executive Login</h2>
+<p>DWU Wabag Students Association — Private Executive Portal</p>
+<form id="loginForm">
+<label>Username</label><input id="username" autocomplete="username" required>
+<label>Password</label><input id="password" type="password" autocomplete="current-password" required>
+<button type="submit">LOGIN</button>
+</form>
+<div id="error" class="error"></div>
+</div></div>
+
+<div id="portal">
+<header><h1>DWU WABAG STUDENTS ASSOCIATION</h1><p>Official Online Association Records Portal • Administrator Controlled</p></header>
+<nav>
+<a href="#home">Home</a><a href="#executive">Executive</a><a href="#records">Records</a>
+<a href="#meetings">Meetings</a><a href="#finance">Finance</a><a href="#archive">Archive</a>
+<a href="#settings">Settings</a>
+</nav>
+<section class="hero" id="home">
+<h2>Welcome to the Executive Portal</h2>
+<div id="frontExecutive" class="card" style="text-align:left;max-width:1050px;margin:25px auto 0"><h2 style="text-align:center">Our Executive Team</h2><div id="frontExecutiveGrid" class="grid"></div></div>
+<p>Manage association information, meeting records, financial documents, reports and historical records.</p>
+<div class="welcome">✅ You are successfully logged in as an Executive.</div>
+<div class="card qr-card">
+<h2>📱 Scan to Open the Portal</h2>
+<p>Members can scan this QR code with their phone camera to open this online portal.</p>
+<div id="qrCode"></div>
+<div class="qr-note">The QR code uses this portal's web address. It will work for members after this portal is hosted on a public HTTPS website.</div>
+<div id="scanUrl" class="scan-url"></div>
+</div>
+<button class="logout" onclick="logout()">LOG OUT</button>
+</section>
+
+<div class="container">
+<section id="executive"><h2>Executive Members</h2>
+<div id="adminMemberControls" class="card">
+<h3>🔐 Administrator Controls</h3>
+<p>Only the Portal Administrator can add, edit, or remove executive members.</p>
+<h3>➕ Add Future Executive Leader</h3>
+<form id="memberForm">
+<label>Position / Role</label>
+<input id="memberRole" placeholder="e.g. President" required>
+<label>Full Name</label>
+<input id="memberName" placeholder="e.g. John Peter" required>
+<label>Profile Picture</label>
+<input id="memberPhoto" type="file" accept="image/*" required>
+<button type="submit">ADD EXECUTIVE MEMBER</button>
+</form>
+<div id="memberMessage" class="welcome" style="display:none"></div>
+</div>
+<div id="executiveGrid" class="grid"></div>
+</section>
+
+<section id="records"><h2>Association Records</h2><div class="grid">
+<div class="card"><h3>📜 Constitution</h3><p>Laws, rules and governance documents.</p><input type="file" data-category="Constitution" multiple><div class="files" id="files-Constitution"></div></div>
+<div class="card"><h3>📝 Meeting Minutes</h3><p>Minutes, agendas and resolutions.</p><input type="file" data-category="Meeting Minutes" multiple><div class="files" id="files-Meeting Minutes"></div></div>
+<div class="card"><h3>👥 Membership</h3><p>Approved membership information.</p><input type="file" data-category="Membership" multiple><div class="files" id="files-Membership"></div></div>
+<div class="card"><h3>📄 Reports</h3><p>Annual, activity and community-service reports.</p><input type="file" data-category="Reports" multiple><div class="files" id="files-Reports"></div></div>
+</div></section>
+
+<section id="meetings"><h2>Meetings</h2><div class="card">
+<h3>2026 Meeting Records</h3><p>Meeting agendas, attendance lists, minutes and decisions.</p>
+<input type="file" data-category="2026 Meeting Records" multiple><div class="files" id="files-2026 Meeting Records"></div>
+</div></section>
+
+<section id="finance"><h2>Finance</h2><div class="grid">
+<div class="card"><h3>Income Records</h3><p>Association income and contributions.</p><input type="file" data-category="Income Records" multiple><div class="files" id="files-Income Records"></div></div>
+<div class="card"><h3>Expense Records</h3><p>Approved expenditure records.</p><input type="file" data-category="Expense Records" multiple><div class="files" id="files-Expense Records"></div></div>
+<div class="card"><h3>Financial Reports</h3><p>Periodic financial statements and reports.</p><input type="file" data-category="Financial Reports" multiple><div class="files" id="files-Financial Reports"></div></div>
+</div></section>
+
+<section id="archive"><h2>Long-Term Archive</h2><div class="grid">
+<div class="card"><h3>2026</h3><p>Founding and 2026 association records.</p><input type="file" data-category="2026 Archive" multiple><div class="files" id="files-2026 Archive"></div></div>
+<div class="card"><h3>2027</h3><p>Future records.</p><input type="file" data-category="2027 Archive" multiple><div class="files" id="files-2027 Archive"></div></div>
+<div class="card"><h3>Future Years</h3><p>Create a new section for each association year.</p><input type="file" data-category="Future Years" multiple><div class="files" id="files-Future Years"></div></div>
+</div></section>
+
+<section id="settings"><h2>Account Settings</h2>
+<div class="card">
+<h3>🔑 Change Password</h3>
+<p>Only the Portal Administrator can change the executive portal password. The new password is stored in this browser for this portal.</p>
+<form id="changePasswordForm">
+<label>Current Password</label><input id="currentPassword" type="password" required>
+<label>New Password</label><input id="newPassword" type="password" minlength="6" required>
+<label>Confirm New Password</label><input id="confirmPassword" type="password" minlength="6" required>
+<button type="submit">CHANGE PASSWORD</button>
+</form>
+<div id="passwordMessage" class="welcome" style="display:none"></div>
+</div></section>
+</div>
+<footer>DWU Wabag Students Association • Executive Portal • 2026</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+const USERNAME="executive";
+const DEFAULT_PASSWORD="Executive@123";
+const PASSWORD_KEY="dwuExecutivePassword";
+
+const loginScreen=document.getElementById("loginScreen");
+const portal=document.getElementById("portal");
+const loginForm=document.getElementById("loginForm");
+const username=document.getElementById("username");
+const password=document.getElementById("password");
+const error=document.getElementById("error");
+
+function getPassword(){
+  return localStorage.getItem(PASSWORD_KEY) || DEFAULT_PASSWORD;
+}
+function makePortalQRCode(){
+  const qrBox=document.getElementById("qrCode");
+  const urlBox=document.getElementById("scanUrl");
+  if(!qrBox || !urlBox) return;
+  const portalUrl=window.location.href.split("#")[0];
+  qrBox.innerHTML="";
+  if(typeof QRCode!=="undefined"){
+    new QRCode(qrBox,{text:portalUrl,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});
+  }else{
+    qrBox.textContent="QR code could not load. Please check your internet connection.";
+  }
+  urlBox.textContent=portalUrl;
+}
+
+function openPortal(){
+  loginScreen.style.display="none";
+  portal.style.display="block";
+  const isAdmin=sessionStorage.getItem("executiveAdmin")==="yes";
+  const controls=document.getElementById("adminMemberControls");
+  const settings=document.getElementById("settings");
+  const settingsNav=[...document.querySelectorAll('nav a')].find(a=>a.getAttribute("href")==="#settings");
+  if(controls) controls.style.display=isAdmin?"block":"none";
+  if(settings) settings.style.display=isAdmin?"block":"none";
+  if(settingsNav) settingsNav.style.display=isAdmin?"inline":"none";
+  scrollTo(0,0);
+  renderAllFiles();
+  renderMembers();
+  makePortalQRCode();
+}
+function showLogin(){loginScreen.style.display="flex";portal.style.display="none";}
+loginForm.addEventListener("submit",function(e){
+  e.preventDefault();
+  if(username.value.trim()===USERNAME && password.value===getPassword()){
+    sessionStorage.setItem("executiveLoggedIn","yes");
+    sessionStorage.setItem("executiveAdmin","yes");
+    error.style.display="none";
+    openPortal();
+  }else{
+    error.textContent="Incorrect username or password.";
+    error.style.display="block";
+  }
+});
+function logout(){
+  sessionStorage.removeItem("executiveLoggedIn");
+  sessionStorage.removeItem("executiveAdmin");
+  loginForm.reset();
+  showLogin();
+}
+
+const DB_NAME="DWUWabagPortalDB", STORE="documents";
+let dbPromise = new Promise((resolve,reject)=>{
+  const req=indexedDB.open(DB_NAME,1);
+  req.onupgradeneeded=()=>req.result.createObjectStore(STORE,{keyPath:"id",autoIncrement:true});
+  req.onsuccess=()=>resolve(req.result);
+  req.onerror=()=>reject(req.error);
+});
+
+async function addFiles(category, files){
+  const db=await dbPromise;
+  for(const file of files){
+    await new Promise((resolve,reject)=>{
+      const tx=db.transaction(STORE,"readwrite");
+      tx.objectStore(STORE).add({category,name:file.name,type:file.type,size:file.size,blob:file,date:new Date().toISOString()});
+      tx.oncomplete=resolve; tx.onerror=()=>reject(tx.error);
+    });
+  }
+  renderFiles(category);
+}
+async function getFiles(category){
+  const db=await dbPromise;
+  return await new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,"readonly");
+    const req=tx.objectStore(STORE).getAll();
+    req.onsuccess=()=>resolve(req.result.filter(x=>x.category===category));
+    req.onerror=()=>reject(req.error);
+  });
+}
+async function deleteFile(id,category){
+  const db=await dbPromise;
+  await new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,"readwrite");
+    tx.objectStore(STORE).delete(id);
+    tx.oncomplete=resolve; tx.onerror=()=>reject(tx.error);
+  });
+  renderFiles(category);
+}
+async function renderFiles(category){
+  const box=document.getElementById("files-"+category);
+  if(!box)return;
+  const items=await getFiles(category);
+  box.innerHTML="";
+  items.forEach(item=>{
+    const row=document.createElement("div");
+    row.className="file-row";
+    const link=document.createElement("a");
+    link.textContent="📎 "+item.name;
+    link.href=URL.createObjectURL(item.blob);
+    link.target="_blank";
+    link.download=item.name;
+    const del=document.createElement("button");
+    del.textContent="Delete";
+    del.className="delete-btn";
+    del.onclick=()=>deleteFile(item.id,category);
+    row.append(link,del);
+    box.appendChild(row);
+  });
+}
+function renderAllFiles(){
+  const isAdmin=sessionStorage.getItem("executiveAdmin")==="yes";
+  document.querySelectorAll("input[type=file][data-category]").forEach(input=>{
+    input.style.display=isAdmin?"block":"none";
+    renderFiles(input.dataset.category);
+  });
+}
+document.querySelectorAll("input[type=file][data-category]").forEach(input=>{
+  input.addEventListener("change",()=>{
+    if(input.files.length) addFiles(input.dataset.category,[...input.files]);
+    input.value="";
+  });
+});
+
+
+const MEMBERS_KEY="dwuExecutiveMembers";
+function loadMembers(){
+  try{return JSON.parse(localStorage.getItem(MEMBERS_KEY)||"[]");}catch(e){return [];}
+}
+function saveMembers(members){localStorage.setItem(MEMBERS_KEY,JSON.stringify(members));}
+function renderMembers(){
+  const grid=document.getElementById("executiveGrid");
+  const frontGrid=document.getElementById("frontExecutiveGrid");
+  const members=loadMembers();
+
+  function buildCard(m, index, front=false){
+    const card=document.createElement("div");
+    card.className="card member-card"+(front?" front-member-card":"");
+    const img=document.createElement("img");
+    img.className="member-photo";
+    img.src=m.photo;
+    img.alt=m.name+" profile picture";
+    const role=document.createElement("h3");
+    role.textContent=m.role;
+    const name=document.createElement("p");
+    name.textContent=m.name;
+    card.append(img,role,name);
+
+    if(!front && sessionStorage.getItem("executiveAdmin")==="yes"){
+      const del=document.createElement("button");
+      del.textContent="Remove Member";
+      del.className="delete-btn";
+      del.onclick=()=>{
+        const current=loadMembers();
+        current.splice(index,1);
+        saveMembers(current);
+        renderMembers();
+      };
+      card.appendChild(del);
+    }
+    return card;
+  }
+
+  if(grid){
+    grid.innerHTML="";
+    members.forEach((m,index)=>grid.appendChild(buildCard(m,index,false)));
+  }
+  if(frontGrid){
+    frontGrid.innerHTML="";
+    if(!members.length){
+      const empty=document.createElement("p");
+      empty.textContent="Executive profiles will appear here when the Portal Administrator adds them.";
+      empty.style.textAlign="center";
+      empty.style.gridColumn="1 / -1";
+      frontGrid.appendChild(empty);
+    }else{
+      members.forEach((m,index)=>frontGrid.appendChild(buildCard(m,index,true)));
+    }
+  }
+}
+
+document.getElementById("memberForm").addEventListener("submit",function(e){
+  e.preventDefault();
+  const role=document.getElementById("memberRole").value.trim();
+  const name=document.getElementById("memberName").value.trim();
+  const photoInput=document.getElementById("memberPhoto");
+  const msg=document.getElementById("memberMessage");
+  if(!photoInput.files.length)return;
+  const file=photoInput.files[0];
+  if(!file.type.startsWith("image/")){
+    msg.textContent="❌ Please choose an image file.";
+    msg.style.display="block";
+    return;
+  }
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const members=loadMembers();
+    members.push({role,name,photo:reader.result});
+    saveMembers(members);
+    renderMembers();
+    this.reset();
+    msg.textContent="✅ Executive member added successfully.";
+    msg.style.display="block";
+  };
+  reader.readAsDataURL(file);
+});
+renderMembers();
+
+document.getElementById("changePasswordForm").addEventListener("submit",function(e){
+  if(sessionStorage.getItem("executiveAdmin")!=="yes") return;
+  e.preventDefault();
+  const current=document.getElementById("currentPassword").value;
+  const next=document.getElementById("newPassword").value;
+  const confirm=document.getElementById("confirmPassword").value;
+  const msg=document.getElementById("passwordMessage");
+  msg.style.display="block";
+  if(current!==getPassword()){msg.textContent="❌ Current password is incorrect.";return;}
+  if(next!==confirm){msg.textContent="❌ New passwords do not match.";return;}
+  if(next.length<6){msg.textContent="❌ Password must be at least 6 characters.";return;}
+  localStorage.setItem(PASSWORD_KEY,next);
+  msg.textContent="✅ Password changed successfully. Use the new password next time you log in.";
+  this.reset();
+});
+
+if(sessionStorage.getItem("executiveLoggedIn")==="yes")openPortal();else showLogin();
+</script>
+</body></html>
